@@ -43,6 +43,18 @@ public class CoinManager : MonoBehaviour
         currentCoins = 0;
         UpdateUI();
     }
+    
+
+public void UpdateCoins(int currentCoins)
+{
+    if (currentCoins > highCoins)
+    {
+        highCoins = currentCoins;
+        PlayerPrefs.SetInt("HighCoins", highCoins);
+        PlayerPrefs.Save();
+    }
+}
+
 
     public void GameOver()
     {
@@ -54,6 +66,9 @@ public class CoinManager : MonoBehaviour
             PlayerPrefs.SetInt("HighCoins", highCoins);
             newHigh = true;
         }
+        if (coinTextTopRight != null)
+    coinTextTopRight.gameObject.SetActive(false);
+
 
         // Game Over UI
         if (gameOverCoinText != null)

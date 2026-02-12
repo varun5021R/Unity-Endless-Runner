@@ -13,24 +13,19 @@ public class GameManager : MonoBehaviour
     public TMP_Text scoreText;
     public TMP_Text highScoreText;
 
-    public TMP_Text coinsText;           
-    public TMP_Text highCoinsText;       
-    public TMP_Text gameOverCoinsText;   
+    private int score = 0;
+    private int highScore = 0;
 
-    int score = 0;
-    int coins = 0;
-
-    int highScore;
-    int highCoins;
-
-    bool gameOver = false;
+    private bool gameOver = false;
 
     void Awake()
     {
         Instance = this;
 
         highScore = PlayerPrefs.GetInt("HighScore", 0);
-        highCoins = PlayerPrefs.GetInt("HighCoins", 0);
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
 
         UpdateUI();
     }
@@ -40,19 +35,15 @@ public class GameManager : MonoBehaviour
         if (!gameOver)
         {
             score += Mathf.RoundToInt(Time.deltaTime * 100f);
-            scoreText.text = "Score : " + score;
+
+            if (scoreText != null)
+                scoreText.text = "Score : " + score;
         }
 
         if (gameOver && Input.GetKeyDown(KeyCode.R))
         {
             RestartGame();
         }
-    }
-
-    public void AddCoin()
-    {
-        coins++;
-        coinsText.text = "Coins: " + coins;
     }
 
     public void GameOver()
@@ -62,45 +53,40 @@ public class GameManager : MonoBehaviour
         gameOver = true;
         Time.timeScale = 0f;
 
-        gameOverPanel.SetActive(true);
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
 
         if (mobileControls != null)
             mobileControls.SetActive(false);
 
-        // Show collected coins
-        gameOverCoinsText.text = "Coins Collected: " + coins;
+        // Let CoinManager handle coins UI
+        if (CoinManager.instance != null)
+            CoinManager.instance.GameOver();
 
         // -------- SCORE CHECK --------
         if (score > highScore)
         {
             highScore = score;
             PlayerPrefs.SetInt("HighScore", highScore);
-            highScoreText.text = "NEW HIGH SCORE: " + highScore;
-        }
-        else
-        {
-            highScoreText.text = "High Score: " + highScore;
-        }
+            PlayerPrefs.Save();
 
-        // -------- COINS CHECK --------
-        if (coins > highCoins)
-        {
-            highCoins = coins;
-            PlayerPrefs.SetInt("HighCoins", highCoins);
-            highCoinsText.text = "NEW HIGH COINS: " + highCoins;
+            if (highScoreText != null)
+                highScoreText.text = "NEW HIGH SCORE: " + highScore;
         }
         else
         {
-            highCoinsText.text = "High Coins: " + highCoins;
+            if (highScoreText != null)
+                highScoreText.text = "High Score: " + highScore;
         }
     }
 
     void UpdateUI()
     {
-        scoreText.text = "Score : 0";
-        coinsText.text = "Coins: 0";
-        highScoreText.text = "High Score: " + highScore;
-        highCoinsText.text = "High Coins: " + highCoins;
+        if (scoreText != null)
+            scoreText.text = "Score : 0";
+
+        if (highScoreText != null)
+            highScoreText.text = "High Score: " + highScore;
     }
 
     public void RestartGame()

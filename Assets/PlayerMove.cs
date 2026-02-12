@@ -2,78 +2,126 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
-    [Header("Speed")]
-    public float forwardSpeed = 12f;
-    public float laneSpeed = 10f;
+    [Header("Lane Settings")]
+    public float laneDistance = 3f;   // Distance between lanes
+    private int currentLane = 1;      // 0 = Left, 1 = Middle, 2 = Right
 
-    [Header("Lane")]
-    public float laneDistance = 3f;
-    private int currentLane = 1; // 0 left, 1 middle, 2 right
+    [Header("Movement")]
+    public float forwardSpeed = 8f;
+    public float laneChangeSpeed = 10f;
 
     [Header("Jump")]
     public float jumpForce = 7f;
+    public LayerMask groundLayer;
 
     private Rigidbody rb;
-    private bool isGrounded = true;
+    private bool isGrounded;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+
+        // Start exactly in middle lane
+        Vector3 pos = transform.position;
+        pos.x = 0f;
+        transform.position = pos;
+    }
+
+    void Update()
+    {
+        HandleLaneInput();
+        HandleJumpInput();
     }
 
     void FixedUpdate()
     {
         MoveForward();
-        HandleLaneMovement();
+        MoveToLane();
+        CheckGround();
     }
 
-    void Update()
+    // =========================
+    // LANE INPUT (Keyboard)
+    // =========================
+    void HandleLaneInput()
     {
-        HandleKeyboardInput();
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+            MoveLeft();
+
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+            MoveRight();
     }
 
+    public void MoveLeft()
+    {
+        currentLane--;
+        currentLane = Mathf.Clamp(currentLane, 0, 2);
+    }
+
+    public void MoveRight()
+    {
+        currentLane++;
+        currentLane = Mathf.Clamp(currentLane, 0, 2);
+    }
+
+    // =========================
+    // FORWARD MOVEMENT
+    // =========================
     void MoveForward()
     {
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, rb.linearVelocity.y, forwardSpeed);
     }
 
-    void HandleKeyboardInput()
+    // =========================
+    // LANE MOVEMENT
+    // =========================
+    void MoveToLane()
+{
+    float targetX = (currentLane - 1) * laneDistance;
+
+    Vector3 pos = rb.position;
+    pos.x = Mathf.Lerp(pos.x, targetX, laneChangeSpeed * Time.fixedDeltaTime);
+
+    rb.MovePosition(pos);
+}
+
+
+    // =========================
+    // JUMP INPUT
+    // =========================
+    void HandleJumpInput()
     {
-        if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
-            currentLane--;
-
-        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
-            currentLane++;
-
-        currentLane = Mathf.Clamp(currentLane, 0, 2);
-
         if (Input.GetKeyDown(KeyCode.Space))
+        {
             Jump();
-    }
-
-    void HandleLaneMovement()
-    {
-        float targetX = (currentLane - 1) * laneDistance;
-        float difference = targetX - transform.position.x;
-        float moveX = difference * laneSpeed;
-
-        rb.linearVelocity = new Vector3(moveX, rb.linearVelocity.y, rb.linearVelocity.z);
+        }
     }
 
     public void Jump()
-    {
-        if (!isGrounded) return;
+{
+    Debug.Log("Jump pressed. Grounded: " + isGrounded);
 
+    if (isGrounded)
+    {
         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        isGrounded = false;
     }
+}
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-            isGrounded = true;
+    // =========================
+    // GROUND CHECK
+    // =========================
+    void CheckGround()
+{
+    float rayLength = 1.2f;
 
-        if (collision.gameObject.CompareTag("Obstacle"))
-            GameManager.Instance.GameOver();
-    }
+    Ray ray = new Ray(transform.position + Vector3.up * 0.1f, Vector3.down);
+
+    isGrounded = Physics.Raycast(ray, rayLength, groundLayer);
+
+    Debug.DrawRay(transform.position + Vector3.up * 0.1f,
+                  Vector3.down * rayLength,
+                  isGrounded ? Color.green : Color.red);
+}
+
+
 }

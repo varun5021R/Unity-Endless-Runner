@@ -5,5 +5,14 @@
 [Bb]uilds/
 [Ll]ogs/
 UserSettings/
+
 *.csproj
 *.sln
+*.user
+*.tmp
+*.booproj
+*.pidb
+*.pdb
+*.mdb
+*.opendb
+*.VC.db

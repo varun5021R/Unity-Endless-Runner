@@ -8,8 +8,8 @@ public class MobileInput : MonoBehaviour,
     public RectTransform joystickHandle;
     public float joystickRadius = 60f;
 
-    private Vector2 inputVector;
     private PlayerMove player;
+    private float lastDirection = 0f;
 
     void Start()
     {
@@ -33,22 +33,28 @@ public class MobileInput : MonoBehaviour,
 
         pos = Vector2.ClampMagnitude(pos, joystickRadius);
         joystickHandle.anchoredPosition = pos;
-        inputVector = pos / joystickRadius;
+
+        float direction = pos.x / joystickRadius;
 
         if (player != null)
         {
-            if (inputVector.x > 0.5f)
-                player.SendMessage("HandleKeyboardInput", SendMessageOptions.DontRequireReceiver);
-
-            if (inputVector.x < -0.5f)
-                player.SendMessage("HandleKeyboardInput", SendMessageOptions.DontRequireReceiver);
+            if (direction > 0.5f && lastDirection <= 0.5f)
+            {
+                player.MoveRight();
+            }
+            else if (direction < -0.5f && lastDirection >= -0.5f)
+            {
+                player.MoveLeft();
+            }
         }
+
+        lastDirection = direction;
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        inputVector = Vector2.zero;
         joystickHandle.anchoredPosition = Vector2.zero;
+        lastDirection = 0f;
     }
 
     public void JumpButton()

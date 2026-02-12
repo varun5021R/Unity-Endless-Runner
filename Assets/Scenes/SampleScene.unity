@@ -2134,10 +2134,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9505429252d25584fb5924eb862c5379, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  forwardSpeed: 10
-  laneSpeed: 10
   laneDistance: 3
+  forwardSpeed: 10
+  laneChangeSpeed: 10
   jumpForce: 6
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!65 &1432496066
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2270,7 +2273,7 @@ GameObject:
   - component: {fileID: 1463864879}
   - component: {fileID: 1463864878}
   - component: {fileID: 1463864877}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: GroundTile
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -2565,9 +2568,6 @@ MonoBehaviour:
   mobileControls: {fileID: 136175291}
   scoreText: {fileID: 276747760}
   highScoreText: {fileID: 612926324}
-  coinsText: {fileID: 1322291016}
-  highCoinsText: {fileID: 1810556260}
-  gameOverCoinsText: {fileID: 415499607}
 --- !u!4 &1785414608
 Transform:
   m_ObjectHideFlags: 0
