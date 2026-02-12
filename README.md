@@ -1,6 +1,13 @@
 Unity Endless Runner
 
-A 3D lane-based endless runner game built using Unity and C#.
+A 3D lane-based endless runner game built using Unity and C#. 
+
+This project demonstrates gameplay programming fundamentals including:
+- Physics-based movement using Rigidbody
+- Smooth lane switching system
+- Jump mechanics with ground detection
+- Mobile joystick input integration
+- Coin system with high-score persistence using PlayerPrefs
 
 Features
 
